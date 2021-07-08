@@ -60,7 +60,7 @@ module.exports = (app) => {
         // 表单配置
         form: {
           // 提交地址
-          action: "/admin/manager/create",
+          action: "/admin/manager",
           // 字段配置
           fields: [
             {
@@ -68,6 +68,7 @@ module.exports = (app) => {
               type: "text",
               name: "username",
               placeholder: "用户名",
+              default:"默认值"
             },
             {
               label: "密码",
@@ -77,6 +78,7 @@ module.exports = (app) => {
             },
           ],
         },
+        
         // 新增成功跳转路径
         successUrl: "/admin/manager",
       });
@@ -126,6 +128,105 @@ module.exports = (app) => {
       });
       ctx.toast("删除成功", "success");
       ctx.redirect("/admin/manager");
+    }
+
+    //编辑表单页
+    async edit() {
+      const { ctx, app } = this;
+      const id = ctx.params.id;
+
+      let data = await app.model.Manager.findOne({
+        where: {
+          id,
+        },
+      });
+      if (!data) {
+        return await ctx.pageFail("该记录不存在");
+      }
+
+      data = JSON.parse(JSON.stringify(data));
+      delete data.password;
+
+      await ctx.renderTemplate({
+        id,
+        title: "修改管理员",
+        tempType: "form",
+        form: {
+          // 提交地址
+          action: "/admin/manager/" + id,
+          // 字段配置
+          fields: [
+            {
+              label: "用户名",
+              type: "text",
+              name: "username",
+              placeholder: "用户名",
+            },
+            {
+              label: "密码",
+              type: "text",
+              name: "password",
+              placeholder: "密码",
+            },
+          ],
+          // 默认值
+          data,
+        },
+        //修改成功后跳转路径
+        successUrl:"/admin/manager"
+      });
+    }
+    async update() {
+      const { ctx, app } = this;
+      ctx.validate({
+        id: {
+          type: "int",
+          required: true,
+        },
+        username: {
+          type: "string",
+          required: true,
+          desc: "管理员名称",
+        },
+        password: {
+          type: "string",
+          required: false,
+          desc: "密码",
+        },
+      });
+
+      let id = ctx.params.id;
+      let { username, password } = ctx.request.body;
+
+      let manager = await app.model.Manager.findOne({
+        where: {
+          id,
+        },
+      });
+      if (!manager) {
+        return ctx.apiFail("该记录不存在");
+      }
+
+      const Op = app.Sequelize.Op;
+
+      if (
+        await app.model.Manager.findOne({
+          where: {
+            id: {
+              [Op.ne]: id,
+            },
+            username,
+          },
+        })
+      ) {
+        return ctx.apiFail("管理员名称已存在");
+      }
+      manager.username = username;
+      if(password){
+        manager.password = password;
+      }
+
+      ctx.apiSuccess(await manager.save());
     }
   }
   return Controller;

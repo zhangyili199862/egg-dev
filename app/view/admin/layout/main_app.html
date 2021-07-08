@@ -27,12 +27,16 @@
 		<![endif]-->
 		<script src="/public/assets/js/vue.min.js"></script>
 		<script src="/public/assets/js/vue.component.js"></script>
+		<script>
+			var Vueapp = new Vue({el: "#vueapp"})
+		</script>
 	</head>
 	<body>
 
 		<!-- Main Wrapper -->
 		<div class="main-wrapper" id="vueapp">
 			<toast ref="toast"></toast>
+			<confirm ref="confirm" ></confirm>
 			<!-- 头部 -->
 			{% include "admin/layout/_header.html" %}
 			<!-- /头部 -->
@@ -92,11 +96,7 @@
 
 		<!-- Custom JS -->
 		<script src="/public/assets/js/script.js"></script>
-		{% block js %}
-			<script>
-				var Vueapp = new Vue({el: "#vueapp"})
-			</script>
-		{% endblock %}
+		{% block js %}{% endblock %}
 
 		<script>
 			var toast = "{{toast.msg}}"

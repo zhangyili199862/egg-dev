@@ -98,18 +98,20 @@ module.exports = {
   },
   //渲染公共模板
   async renderTemplate(params = {}) {
-    let toast = this.cookies.get('toast',{
-      encrypt:true
+    let toast = this.cookies.get("toast", {
+      encrypt: true,
     });
-
     params.toast = toast ? JSON.parse(toast) : null;
-    console.log(params.toast);
     await this.render("admin/common/template.html", params);
   },
   toast(msg, type = "danger") {
-    this.cookies.set("toast", JSON.stringify(msg, type), {
+    this.cookies.set("toast", JSON.stringify({ msg, type }), {
       maxAge: 1500,
       encrypt: true,
     });
   },
+  //错误提示
+  async pageFail(data = '',code= 404){
+    return await this.render('admin/common/404.html',{data,code})
+  }
 };

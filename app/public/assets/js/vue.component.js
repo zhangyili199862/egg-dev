@@ -19,7 +19,6 @@ Vue.component("toast", {
   },
   methods: {
     show(options) {
-      console.log("123");
       this.msg = options.msg || "";
       this.type = options.type || "danger";
       this.toast = true;
@@ -29,10 +28,59 @@ Vue.component("toast", {
       this.timer = setTimeout(() => {
         this.hide();
         this.timer = null;
+        if(options.success && typeof options.success === 'function'){
+          options.success();
+        }
       }, options.delay || 1500);
     },
     hide() {
       this.toast = false;
+    },
+  },
+});
+
+Vue.component("confirm", {
+  template: `
+  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalCenterTitle">{{title}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{content}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="hide">取消</button>
+          <button type="button" class="btn btn-primary" @click="confirm">确定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  `,
+  data() {
+    return {
+      title: "提示",
+      content: "",
+    };
+  },
+  methods: {
+    show(options = {}) {
+      this.title = options.title || "";
+      this.content = options.content;
+      this.success = options.success || null;
+      $("#exampleModalCenter").modal("show");
+    },
+    hide() {
+      $("#exampleModalCenter").modal("hide");
+    },
+    confirm() {
+      if (this.success && typeof this.success === "function") {
+        this.success();
+      }
     },
   },
 });
