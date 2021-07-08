@@ -16,8 +16,15 @@ module.exports = (appInfo) => {
   config.keys = appInfo.name + "_1624503257180_9377";
 
   // add your middleware config here
-  config.middleware = ["errorHandler"];
+  config.middleware = ["errorHandler", "adminAuth"];
 
+  config.adminAuth ={
+    ignore:[
+      '/api',
+      '/admin/login',
+      '/admin/loginevent'
+    ]
+  }
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',
@@ -75,11 +82,11 @@ module.exports = (appInfo) => {
   config.crypto = {
     secret: "qhdgw@45ncashdaksh2!#@3nxjdas*_672",
   };
-  config.session =  {
+  config.session = {
     // 在有些场景下，我们希望用户如果长时间都在访问我们的站点，则延长他们的 Session 有效期，不让用户退出登录态
     renew: true,
     // key 代表了存储 Session 的 Cookie 键值对的 key 是什么
-    key: 'EGG_SESS',
+    key: "EGG_SESS",
     // 最长保存时间（毫秒）
     maxAge: 24 * 3600 * 1000 * 30, // 30 天
     // 设置键值对是否可以被 js 访问，默认为 true，不允许被 js 访问。

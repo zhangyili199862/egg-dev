@@ -1,14 +1,21 @@
 "use strict";
-const crypto = require('crypto');
+const crypto = require("crypto");
 module.exports = (app) => {
   class Controller extends app.Controller {
+    // 登录页
     async login() {
-      let { ctx } = this;
-      await ctx.render("admin/home/login.html");
+      const { ctx } = this;
+      let toast = ctx.cookies.get("toast", { encrypt: true });
+      toast = toast ? JSON.parse(toast) : null;
+      await ctx.render("admin/home/login.html", {
+        toast,
+      });
     }
+
+    // 登录逻辑
     async loginevent() {
-      let { ctx, app } = this;
-      //参数验证
+      const { ctx, app } = this;
+      // 参数验证
       ctx.validate({
         username: {
           type: "string",
@@ -22,18 +29,24 @@ module.exports = (app) => {
         },
       });
       let { username, password } = ctx.request.body;
+      // 验证该用户是否存在|验证该用户状态是否启用
       let manager = await app.model.Manager.findOne({
         where: {
           username,
         },
       });
       if (!manager) {
-        ctx.throw(400, "该管理员不存在");
+        ctx.throw(400, "用户不存在或已被禁用");
       }
+      // 验证密码
       await this.checkPassword(password, manager.password);
+
+      // 记录到session中
       ctx.session.auth = manager;
+
       return ctx.apiSuccess("ok");
     }
+    // 验证密码
     async checkPassword(password, hash_password) {
       // 先对需要验证的密码进行加密
       const hmac = crypto.createHash("sha256", this.app.config.crypto.secret);
@@ -44,6 +57,14 @@ module.exports = (app) => {
         this.ctx.throw(400, "密码错误");
       }
       return true;
+    }
+    // 退出登录
+    async logout() {
+      const { ctx, service } = this;
+      // 清除session
+      ctx.session.auth = null;
+      ctx.toast("退出登录成功", "success");
+      ctx.redirect(`/admin/login`);
     }
   }
   return Controller;
