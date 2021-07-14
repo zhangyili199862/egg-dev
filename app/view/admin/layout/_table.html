@@ -7,6 +7,15 @@
         </div>
     {% endif %}
     <div class="card-body">
+        {% if table.tabs %}
+            <ul class="nav nav-tabs nav-tabs-top">
+                {% for item in table.tabs %}
+                    <li class="nav-item">
+                        <a href="{{item.url}}" class="nav-link {% if item.active %} active {% endif %}">{{item.name}}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
         <div class="table-responsive">
             {% if table %}
                 <table class="table table-hover table-center mb-0">
@@ -24,6 +33,8 @@
                                     <td class="text-{{item2.fixed}}">
                                         {% if item2.key %}
                                             {{item[item2.key]}}
+                                        {% elif item2.render%}
+                                            {{item2.render(item) | safe}}
                                         {% else %}
                                             <div class="actions">
                                                 {% if item2.action.edit %}
@@ -61,12 +72,39 @@
                     .$refs
                     .confirm
                     .show({
-                        title: "新标题",
+                        title: "提示",
                         content: "是否要删除该记录?",
                         success: () => {
                             window.location.href = url;
                             console.log('删除成功')
                         }
+                    })
+            },
+            openInfo(url, title) {
+                this
+                    .$refs
+                    .confirm
+                    .show({
+                        title,
+                        isconfirm: false,
+                        ths: [
+                            {
+                                title: '用户名',
+                                key: "username"
+                            }, {
+                                title: '观看时间',
+                                key: "create_time"
+                            }
+                        ],
+                        data: [
+                            {
+                                username: '123123',
+                                create_time: '2020-02-13 00:00:12'
+                            }, {
+                                username: '4565465',
+                                create_time: '2020-02-13 00:12:12'
+                            }
+                        ]
                     })
             }
         }

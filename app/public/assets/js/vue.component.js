@@ -28,7 +28,7 @@ Vue.component("toast", {
       this.timer = setTimeout(() => {
         this.hide();
         this.timer = null;
-        if(options.success && typeof options.success === 'function'){
+        if (options.success && typeof options.success === "function") {
           options.success();
         }
       }, options.delay || 1500);
@@ -50,10 +50,26 @@ Vue.component("confirm", {
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" v-if='isconfirm'>
           {{content}}
         </div>
-        <div class="modal-footer">
+        <div class="modal-body" v-else>
+        <table class="table table-striped">
+        <thead>
+        <tr>
+            <th v-for="(item,index) in ths" :key="index">{{item.title}}</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr v-for="(item,index) in data" :key="index">
+                <td v-for="(k,ki) in ths" :key="ki">
+                    {{ item[k.key] }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+        </div>
+        <div class="modal-footer" v-if='isconfirm'>
           <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="hide">取消</button>
           <button type="button" class="btn btn-primary" @click="confirm">确定</button>
         </div>
@@ -65,6 +81,9 @@ Vue.component("confirm", {
     return {
       title: "提示",
       content: "",
+      isconfirm: true,
+      ths: [],
+      data: [],
     };
   },
   methods: {
@@ -72,6 +91,9 @@ Vue.component("confirm", {
       this.title = options.title || "";
       this.content = options.content;
       this.success = options.success || null;
+      this.isconfirm = options.isconfirm === false ? false : true;
+      this.ths = options.ths || [];
+      this.data = options.data || [];
       $("#exampleModalCenter").modal("show");
     },
     hide() {

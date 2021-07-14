@@ -16,18 +16,33 @@ module.exports = (appInfo) => {
   config.keys = appInfo.name + "_1624503257180_9377";
 
   // add your middleware config here
-  config.middleware = ["errorHandler", "adminAuth"];
+  config.middleware = ["errorHandler", "adminAuth", "adminSidebar"];
 
-  config.adminAuth ={
-    ignore:[
-      '/api',
-      '/admin/login',
-      '/admin/loginevent'
-    ]
-  }
+  config.adminAuth = {
+    ignore: ["/api", "/admin/login", "/admin/loginevent"],
+  };
+  config.adminSidebar = {
+    ignore: ["/api", "/admin/login", "/admin/loginevent", "/public"],
+  };
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',
+  };
+  config.multipart = {
+    fileSize: "50mb",
+    mode: "stream",
+    fileExtensions: [
+      ".xls",
+      ".txt",
+      ".jpg",
+      ".JPG",
+      ".png",
+      ".PNG",
+      ".gif",
+      ".GIF",
+      ".jpeg",
+      ".JPEG",
+    ], // 扩展几种上传的文件格式
   };
   config.security = {
     // 关闭 csrf

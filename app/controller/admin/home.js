@@ -2,6 +2,11 @@
 const crypto = require("crypto");
 module.exports = (app) => {
   class Controller extends app.Controller {
+    //后台首页
+    async index(){
+      let {ctx} = this;
+      await ctx.render('admin/home/index.html')
+    }
     // 登录页
     async login() {
       const { ctx } = this;

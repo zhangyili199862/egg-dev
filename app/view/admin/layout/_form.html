@@ -6,7 +6,12 @@
                     <div class="form-group row">
                         <label class="col-form-label col-md-2">{{item.label}}</label>
                         <div class="col-md-10">
-                            <input name="{{item.name}}" type="{{item.type}}" class="form-control" placeholder="{{item.placeholder}}" v-model="form.{{item.name}}">
+                            {% if item.type === 'file' %}
+                                <input name="{{item.name}}" type="file" class="form-control" @change="fileUpload($event,'{{item.name}}')">
+                                <img :src="form.{{item.name}}" v-if="form.{{item.name}}" class="avatar-lg border rounded p- mt-2">
+                                {%else%}
+                                <input name="{{item.name}}" type="{{item.type}}" class="form-control" placeholder="{{item.placeholder}}" v-model="form.{{item.name}}">
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
@@ -29,19 +34,48 @@
                     contentType: "application/json;chatset=UTF-8",
                     data: JSON.stringify(this.form),
                     success: function (res) {
-                        Vueapp.$refs.toast.show({
-                            msg:"{{'修改' if id else '新增'}}成功",
-                            type:"success",
-                            success:function(){
-                                window.location.href = "{{ successUrl }}"
-                            }
-                        })
+                        Vueapp
+                            .$refs
+                            .toast
+                            .show({
+                                msg: "{{'修改' if id else '新增'}}成功",
+                                type: "success",
+                                success: function () {
+                                    window.location.href = "{{ successUrl }}"
+                                }
+                            })
                     },
                     error: function (e) {
-                        Vueapp.$refs.toast.show({
-                            msg:e.responseJSON.data,
-                            type:"danger"
-                        })
+                        Vueapp
+                            .$refs
+                            .toast
+                            .show({msg: e.responseJSON.data, type: "danger"})
+                    }
+                })
+            },
+            fileUpload(event, name) {
+                let _t = this;
+                let file = event.target.files;
+                let formData = new FormData();
+                formData.append('file', file[0])
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/upload?_csrf={{ctx.csrf | safe }}",
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (res) {
+                        _t.form[name] = res.data.url;
+                        Vueapp
+                            .$refs
+                            .toast
+                            .show({msg: "上传成功", type: "success"})
+                    },
+                    error: function (e) {
+                        Vueapp
+                            .$refs
+                            .toast
+                            .show({msg: e.responseJSON.data, type: "danger"})
                     }
                 })
             }
