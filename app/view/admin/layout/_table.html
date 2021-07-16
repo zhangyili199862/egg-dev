@@ -81,31 +81,21 @@
                     })
             },
             openInfo(url, title) {
-                this
-                    .$refs
-                    .confirm
-                    .show({
-                        title,
-                        isconfirm: false,
-                        ths: [
-                            {
-                                title: '用户名',
-                                key: "username"
-                            }, {
-                                title: '观看时间',
-                                key: "create_time"
-                            }
-                        ],
-                        data: [
-                            {
-                                username: '123123',
-                                create_time: '2020-02-13 00:00:12'
-                            }, {
-                                username: '4565465',
-                                create_time: '2020-02-13 00:12:12'
-                            }
-                        ]
-                    })
+
+                var _t = this;
+
+                $.ajax({
+                    type: "GET",
+                    contentType: "application/json;charset=UTF-8",
+                    url: url,
+                    success: function (result) {
+                        _t
+                            .$refs
+                            .confirm
+                            .show({title, isconfirm: false, ths: result.data.ths, data: result.data.data})
+                    }
+                })
+
             }
         }
     })

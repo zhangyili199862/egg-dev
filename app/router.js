@@ -39,6 +39,8 @@ module.exports = (app) => {
   router.get("/admin/order/delete/:id", controller.admin.order.delete);
   //直播间
   router.get("/admin/live", controller.admin.live.index);
+  router.get("/admin/live/look/:id", controller.admin.live.look);
+  router.get("/admin/live/gift/:id", controller.admin.live.gift);
   //上传文件
   router.post("/admin/upload", controller.admin.common.upload);
 };

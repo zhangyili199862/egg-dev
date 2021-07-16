@@ -85,7 +85,8 @@ module.exports = (app) => {
                       <a class="btn btn-sm bg-primary text-white"
                       @click="openInfo('/admin/live/look/${item.id}','观看记录')">
                       观看记录</a> 
-                      <a class="btn btn-sm bg-purple text-white">
+                      <a class="btn btn-sm bg-purple text-white"
+                      @click="openInfo('/admin/live/gift/${item.id}','礼物记录')">
                       礼物记录</a> 
                       <a class="btn btn-sm bg-success text-white">
                       弹幕记录</a> 
@@ -99,6 +100,97 @@ module.exports = (app) => {
           ],
         },
         data,
+      });
+    }
+    //观看记录
+    async look() {
+      const { ctx, app } = this;
+      const id = ctx.params.id;
+      let res = await app.model.LiveUser.findAll({
+        where: {
+          live_id: id,
+        },
+        include: [
+          {
+            model: app.model.User,
+            attributes: ["id", "username", "avatar"],
+          },
+        ],
+      });
+
+      ctx.apiSuccess({
+        ths: [
+          {
+            title: "用户名",
+            key: "username",
+          },
+          {
+            title: "观看时间",
+            key: "created_time",
+          },
+        ],
+        data: res.map((item) => {
+          return {
+            id: item.id,
+            username: item.user.username,
+            avatar: item.user.avatar,
+            created_time: app.formatTime(item.created_time),
+          };
+        }),
+      });
+    }
+    //礼物记录
+    async gift() {
+      const { ctx, app } = this;
+      const id = ctx.params.id;
+      let res = await app.model.LiveGift.findAll({
+        where: {
+          live_id: id,
+        },
+        include: [
+          {
+            model: app.model.User,
+            attributes: ["id", "username"],
+          },
+          {
+            model: app.model.Gift,
+          },
+        ],
+      });
+
+      ctx.apiSuccess({
+        ths: [
+          {
+            title: "礼物名称",
+            key: "gift_name",
+          },
+          {
+            title: "礼物图标",
+            key: "gift_image",
+            type:"image"
+          },
+          {
+            title: "礼物金币",
+            key: "gift_coin",
+          },
+          {
+            title: "赠送者",
+            key: "username",
+          },
+          {
+            title: "赠送时间",
+            key: "created_time",
+          },
+        ],
+        data: res.map((item) => {
+          return {
+            gift_name: item.gift.name,
+            gift_image: item.gift.image,
+            gift_coin: item.gift.coin,
+            username: item.user.username,
+            created_time: app.formatTime(item.created_time),
+          };
+        }),
       });
     }
   }

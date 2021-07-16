@@ -63,7 +63,11 @@ Vue.component("confirm", {
         <tbody>
             <tr v-for="(item,index) in data" :key="index">
                 <td v-for="(k,ki) in ths" :key="ki">
-                    {{ item[k.key] }}
+                  <img v-if="k.type==='image'" :src="item[k.key]" class="avatar-sm">
+                  <span v-else>
+                  {{ item[k.key] }}
+                  
+                  </span>
                 </td>
             </tr>
         </tbody>
